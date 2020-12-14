@@ -50,7 +50,25 @@ app
   })
   // UPDATE
   .put((req, res) => {
-    // User.findByIdAndUpdate()
+    //update existing user and return the udpated user info
+    User.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: req.body.newData.name,
+        email: req.body.newData.email,
+        password: req.body.newData.password,
+      },
+      { new: true },
+      (err, data) => {
+        if (err) {
+          res.json({ success: false, msg: err });
+        } else if (!data) {
+          res.json({ success: false, msg: "Not Found" });
+        } else {
+          res.json({ success: true, msg: data });
+        }
+      }
+    );
   })
   // DELETE
   .delete((req, res) => {
