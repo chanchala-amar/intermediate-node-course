@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const port = 8000;
 const app = express();
-const User = require(".models/User");
+const User = require("./models/User");
 
 mongoose.connect("mongodb://localhost/userData");
 app.use(bodyParser.json());
@@ -14,14 +14,39 @@ app.listen(port, () => {
 
 // CREATE
 app.post("/users", (req, res) => {
-  // User.create()
+  // create new users
+  User.create(
+    {
+      name: req.body.newData.name,
+      email: req.body.newData.email,
+      password: req.body.newData.password,
+    },
+    (err, data) => {
+      if (err) {
+        res.json({ success: false, msg: err });
+      } else if (!data) {
+        res.json({ success: false, msg: "Not Found" });
+      } else {
+        res.json({ success: true, msg: data });
+      }
+    }
+  );
 });
 
 app
   .route("/users/:id")
   // READ
   .get((req, res) => {
-    // User.findById()
+    //return user info for a given user id
+    User.findById(req.params.id, (err, data) => {
+      if (err) {
+        res.json({ success: false, msg: err });
+      } else if (!data) {
+        res.json({ success: false, msg: "Not Found!" });
+      } else {
+        res.json({ success: true, msg: data });
+      }
+    });
   })
   // UPDATE
   .put((req, res) => {
