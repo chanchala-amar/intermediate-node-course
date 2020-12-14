@@ -72,5 +72,14 @@ app
   })
   // DELETE
   .delete((req, res) => {
-    // User.findByIdAndDelete()
+    //delete user with the given id
+    User.findByIdAndDelete(req.params.id, (err, data) => {
+      if (err) {
+        res.json({ success: false, msg: err });
+      } else if (!data) {
+        res.json({ success: false, msg: "Not Found" });
+      } else {
+        res.json({ success: true, msg: data });
+      }
+    });
   });
