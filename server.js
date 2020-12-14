@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const port = 8000;
 const app = express();
 const User = require("./models/User");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 mongoose.connect("mongodb://localhost/userData");
 app.use(bodyParser.json());
@@ -25,10 +27,19 @@ function sendResponse(res, err, data) {
 
 // CREATE
 app.post("/users", (req, res) => {
-  // create new users
-  User.create({ ...req.body.newData }, (err, data) =>
-    sendResponse(res, err, data)
-  );
+  //encrypt the password before storing in the db
+  bcrypt.hash(req.body.newData.password, saltRounds, function (err, hash) {
+    if (err) {
+      res.json({ success: false, msg: err });
+    } else {
+      //create a temp user and substitue the pain text password with encrypted password
+      let tempUser = { ...req.body.newData };
+      tempUser.password = hash;
+
+      // create new users
+      User.create(tempUser, (err, data) => sendResponse(res, err, data));
+    }
+  });
 });
 
 app
